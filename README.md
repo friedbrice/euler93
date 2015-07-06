@@ -14,7 +14,7 @@ Acknowledgements to MichalTerepeta et. al. for the AExpr type [[3]][3]
 and to hammer for the algorithm used to generate all abstract syntax
 trees in [[4]][4].
 
-  [1]:(https://projecteuler.net/problem=93)
-  [2]:(https://www.hackerrank.com/contests/projecteuler/challenges/euler093)
-  [3]:(https://wiki.haskell.org/Parsing_a_simple_imperative_language)
-  [4]:(http://stackoverflow.com/questions/9525074/i-need-to-create-haskell-function-which-returns-all-possible-binary-trees-give)
+  [1]: https://projecteuler.net/problem=93
+  [2]: https://www.hackerrank.com/contests/projecteuler/challenges/euler093
+  [3]: https://wiki.haskell.org/Parsing_a_simple_imperative_language
+  [4]: http://stackoverflow.com/questions/9525074/i-need-to-create-haskell-function-which-returns-all-possible-binary-trees-give
