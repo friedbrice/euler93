@@ -30,7 +30,7 @@ instance Show (AExpr) where
     show (ABin op l r) = "(" ++ show l ++ show op ++ show r ++ ")"
 
 evalAExpr :: AExpr -> Maybe Rational
--- ^ evaluates an AExpr to a Rational, maybe
+-- ^ safely evaluates an AExpr to a Maybe Rational
 evalAExpr (IntCon x)     = Just $ fromInteger x
 evalAExpr (ABin Add l r) = liftM2 (+) (evalAExpr l) (evalAExpr r)
 evalAExpr (ABin Sub l r) = liftM2 (-) (evalAExpr l) (evalAExpr r)
@@ -44,7 +44,8 @@ evalAExpr (ABin Div l r) = join $ liftM2 safeDiv l' r'
     safeDiv a b = Just $ a / b
 
 opInsert :: [Integer] -> [AExpr]
--- ^ builds list of AExprs from a given ordered list of integers
+-- ^ returns list of all AExprs that use each member of the given list,
+--   in the order given, exactly once
 opInsert []       = []
 opInsert (x:[])   = [IntCon x]
 opInsert (x:y:zs) = do
@@ -56,11 +57,13 @@ opInsert (x:y:zs) = do
             return $ ABin op (IntCon x) second
 
 allAExprs :: [Integer] -> [AExpr]
--- ^ all of our expressions in one list
+-- ^ returns list of all AExprs that use each member of the given list,
+--   in any order, exactly once
 allAExprs = concatMap opInsert . permutations
 
 targets :: [Integer] -> [Integer]
--- ^ all the integers produced by our expressions
+-- ^ returns the strictly increasing list of all target integers that
+--   are obtainable from the given list of integers
 targets = allAExprs
         # map evalAExpr
         # catMaybes
@@ -70,19 +73,15 @@ targets = allAExprs
         # group
         # map head
 
-posSeq :: [Integer] -> [Integer]
--- ^ only the sequential positive targets
-posSeq = targets
+result :: [Integer] -> Int
+-- ^ returns the largest positive sequential integer obtainable from the
+--   input list
+result = targets
        # filter (> 0)
        # zip [1..]
        # takeWhile (\(a,b) -> a == b)
        # map snd
-
-result :: [Integer] -> Integer
--- ^ output congenial to the problem statement
-result ints = if posSeq ints == []
-    then 0
-    else last . posSeq $ ints
+       # length
 
 main :: IO ()
 main = getLine >> getLine >>= words # map read # result # print
