@@ -30,7 +30,7 @@ instance Show (AExpr) where
     show (ABin op l r) = "(" ++ show l ++ show op ++ show r ++ ")"
 
 evalAExpr :: AExpr -> Maybe Rational
--- ^ evaluates an AExpr to an Integer, maybe
+-- ^ evaluates an AExpr to a Rational, maybe
 evalAExpr (IntCon x)     = Just $ fromInteger x
 evalAExpr (ABin Add l r) = liftM2 (+) (evalAExpr l) (evalAExpr r)
 evalAExpr (ABin Sub l r) = liftM2 (-) (evalAExpr l) (evalAExpr r)
