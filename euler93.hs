@@ -2,11 +2,6 @@ import Control.Monad (join, liftM2)
 import Data.List (group, permutations, sort)
 import Data.Maybe (catMaybes)
 
-infixl 9 #
-(#) :: (a -> b) -> (b -> c) -> a -> c
--- ^ convenience infix op for reverse function composition
-(#) = flip (.)
-
 -- | a data structure for machine-readable arithmetic expressions
 data AExpr = IntCon !Integer
            | ABin !ABinOp !AExpr !AExpr
@@ -61,6 +56,11 @@ allAExprs :: [Integer] -> [AExpr]
 -- ^ returns list of all AExprs that use each member of the given list,
 --   in any order, exactly once
 allAExprs = concatMap opInsert . permutations
+
+infixl 9 #
+(#) :: (a -> b) -> (b -> c) -> a -> c
+-- ^ convenience infix op for reverse function composition
+(#) = flip (.)
 
 targets :: [Integer] -> [Integer]
 -- ^ returns the strictly increasing list of all target integers that
