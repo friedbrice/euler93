@@ -68,9 +68,9 @@ targets :: [Integer] -> [Integer]
 targets = allAExprs
           # map evalAExpr
           # catMaybes
-          # sort
           # filter (\x -> x == (fromInteger . round $ x))
           # map round
+          # sort
           # group
           # map head
 
