@@ -16,7 +16,7 @@ data ABinOp = Add
             | Sub
             | Mul
             | Div
-    deriving EQ
+    deriving Eq
 
 -- | replaces an ABinOp token with its common symbol
 instance Show (ABinOp) where
