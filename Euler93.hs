@@ -81,7 +81,6 @@ result = targets
          # filter (> 0)
          # zip [1..]
          # takeWhile (uncurry (==))
-         # map snd
          # length
 
 main :: IO ()
