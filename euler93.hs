@@ -16,6 +16,7 @@ data ABinOp = Add
             | Sub
             | Mul
             | Div
+    deriving EQ
 
 -- | replaces an ABinOp token with its common symbol
 instance Show (ABinOp) where
@@ -32,14 +33,14 @@ instance Show (AExpr) where
 evalAExpr :: AExpr -> Maybe Rational
 -- ^ safely evaluates an AExpr to a Maybe Rational
 evalAExpr (IntCon x)     = Just $ fromInteger x
-evalAExpr (ABin Add l r) = liftM2 (+) (evalAExpr l) (evalAExpr r)
-evalAExpr (ABin Sub l r) = liftM2 (-) (evalAExpr l) (evalAExpr r)
-evalAExpr (ABin Mul l r) = liftM2 (*) (evalAExpr l) (evalAExpr r)
-evalAExpr (ABin Div l r) = join $ liftM2 safeDiv l' r'
+evalAExpr (ABin op l r)
+    | op == Add = liftM2 (+) l' r'
+    | op == Sub = liftM2 (-) l' r'
+    | op == Mul = liftM2 (*) l' r'
+    | op == Div = join $ liftM2 safeDiv l' r'
   where
     l' = evalAExpr l
     r' = evalAExpr r
-    safeDiv :: Rational -> Rational -> Maybe Rational
     safeDiv _ 0 = Nothing
     safeDiv a b = Just $ a / b
 
