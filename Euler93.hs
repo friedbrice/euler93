@@ -3,7 +3,7 @@ import Data.List
 import Data.Maybe (catMaybes)
 
 -- | a data structure for machine-readable arithmetic expressions
-data AExpr = IntConst !Integer
+data AExpr = IntConst !Int
            | ABinary !ABinOp !AExpr !AExpr
 
 -- | an auxiliary data structure for representing binary ops in AExpr
@@ -25,26 +25,27 @@ instance Show (AExpr) where
   show (IntConst n) = show n
   show (ABinary op l r) = "(" ++ show l ++ show op ++ show r ++ ")"
 
-allAExprs :: [Integer] -> [AExpr]
-allAExprs xs = do
-  op <- [Add, Subtract, Multiply, Divide]
-  allAExprs' xs op
+allAExprs :: [Int] -> [AExpr]
+allAExprs xs
+  | length xs == 1 = return $ IntConst $ head xs
+  | otherwise = [Add, Subtract, Multiply, Divide] >>= allAExprs' xs
 
-allAExprs' :: [Integer] -> ABinOp -> [AExpr]
+allAExprs' :: [Int] -> ABinOp -> [AExpr]
 allAExprs' xs op
   | length xs == 2 =
-      [ ABinary op (IntConst $ head xs) (IntConst $ xs!!1)
-      , ABinary op (IntConst $ xs!!1) (IntConst $ head xs)
-      ]
+    let x = IntConst $ head xs
+        y = IntConst $ xs!!1
+    in [ ABinary op x y, ABinary op y x ]
   | otherwise = do
       x <- xs
-      subAExpr <- allAExprs $ delete x xs
-      [ ABinary op (IntConst x) subAExpr
-        , ABinary op subAExpr (IntConst x)
-        ] -- How do I make this pretty???
+      let leaf = IntConst x
+      allAExprs (delete x xs) >>=
+        \y -> [ ABinary op leaf y
+              , ABinary op y leaf
+              ]
 
 evalAExpr :: AExpr -> Maybe Rational
-evalAExpr (IntConst x) = Just $ fromInteger x
+evalAExpr (IntConst x) = Just $ fromIntegral x
 evalAExpr (ABinary op l r)
   | op /= Divide = liftM2 f l' r'
   | otherwise = join $ liftM2 safeDiv l' r'
@@ -62,7 +63,7 @@ infixl 9 #
 -- ^ convenience infix op for reverse function composition
 (#) = flip (.)
 
-targets :: [Integer] -> [Integer]
+targets :: [Int] -> [Int]
 -- ^ returns the strictly increasing list of all target integers that
 --   are obtainable from the given list of integers
 targets = allAExprs
@@ -71,10 +72,9 @@ targets = allAExprs
           # filter (\x -> x == (fromInteger . round $ x))
           # map round
           # sort
-          # group
-          # map head
+          # nub
 
-result :: [Integer] -> Int
+result :: [Int] -> Int
 -- ^ returns the largest positive sequential integer obtainable from the
 --   input list
 result = targets
