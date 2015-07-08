@@ -19,3 +19,4 @@ cabal.sandbox.config
 euler93
 Euler93
 *.txt
+allEvals
