@@ -36,3 +36,6 @@ opInsert (x:[])   = [IntCon x]
 opInsert ints     = do
     (ls, rs) <- splits ints
     ABin <$> [Add, Sub, Mul, Div] <*> opInsert ls <*> opInsert rs
+
+allAExprs :: [Integer] -> [AExpr]
+allAExprs = concatMap opInsert . permutations
