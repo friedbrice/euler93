@@ -4,9 +4,12 @@ import Data.List
 import Data.Maybe
 
 splits :: [a] -> [([a], [a])]
+-- ^ returns all way to cut the given list into two non-empty lists
 splits xs = init . tail $ zip (inits xs) (tails xs)
 
 opInsert :: [Rational] -> [Maybe Rational]
+-- ^ returns all arithmetic combinations of the numbers from the given
+--   list in the order given.
 opInsert [x]  = [Just x]
 opInsert ints = do
     (ls, rs) <- splits ints
@@ -22,6 +25,8 @@ opInsert ints = do
     [p, m, t, d] <*> opInsert ls <*> opInsert rs
 
 allEvals :: [Rational] -> [Maybe Rational]
+-- ^ returns all arithmetic combinations of the numbers from the given
+--   list in any order.
 allEvals = concatMap opInsert . permutations
 
 infixl 9 #
@@ -30,8 +35,8 @@ infixl 9 #
 (#) = flip (.)
 
 targets :: [Int] -> [Int]
--- ^ returns the list of all target integers that are obtainable from the given
--- list of integers
+-- ^ returns the list of all target integers that are obtainable from
+--   the given list of integers
 targets = map fromIntegral
           # allEvals
           # catMaybes
@@ -40,8 +45,8 @@ targets = map fromIntegral
           # nub
 
 result :: [Int] -> Int
--- ^ returns the largest positive sequential integer obtainable from the input
--- list
+-- ^ returns the largest positive sequential integer obtainable from the
+--   given list of integers
 result = targets
          # (sort . filter (> 0))
          # zip [1..]
