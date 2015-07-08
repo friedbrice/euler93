@@ -1,5 +1,4 @@
 import Control.Applicative
-import Control.Monad
 import Data.List
 import Data.Maybe
 
@@ -13,9 +12,9 @@ opInsert :: [Rational] -> [Maybe Rational]
 opInsert [x]  = [Just x]
 opInsert ints = do
     (ls, rs) <- splits ints
-    let p = liftM2 (+)
-        m = liftM2 (-)
-        t = liftM2 (*)
+    let p = liftA2 (+)
+        m = liftA2 (-)
+        t = liftA2 (*)
         d = safeDiv
           where
             safeDiv Nothing  _        = Nothing
