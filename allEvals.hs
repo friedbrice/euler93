@@ -1,14 +1,52 @@
 import Control.Applicative
+import Control.Monad
 import Data.List
+import Data.Maybe
 
 splits :: [a] -> [([a], [a])]
 splits xs = init . tail $ zip (inits xs) (tails xs)
 
-opInsert :: [Rational] -> [Rational]
-opInsert [x]  = [x]
+opInsert :: [Rational] -> [Maybe Rational]
+opInsert [x]  = [Just x]
 opInsert ints = do
     (ls, rs) <- splits ints
-    [(+), (-), (*), (/)] <*> opInsert ls <*> opInsert rs
+    let p = liftM2 (+)
+        m = liftM2 (-)
+        t = liftM2 (*)
+        d = safeDiv
+          where
+            safeDiv Nothing  _        = Nothing
+            safeDiv _        Nothing  = Nothing
+            safeDiv _        (Just 0) = Nothing
+            safeDiv (Just a) (Just b) = Just $ a / b
+    [p, m, t, d] <*> opInsert ls <*> opInsert rs
 
-allEvals :: [Rational] -> [Rational]
+allEvals :: [Rational] -> [Maybe Rational]
 allEvals = concatMap opInsert . permutations
+
+infixl 9 #
+(#) :: (a -> b) -> (b -> c) -> a -> c
+-- ^ convenience infix op for reverse function composition
+(#) = flip (.)
+
+targets :: [Int] -> [Int]
+-- ^ returns the list of all target integers that are obtainable from the given
+-- list of integers
+targets = map fromIntegral
+          # allEvals
+          # catMaybes
+          # filter (\x -> x == (fromInteger . round $ x))
+          # map round
+          # nub
+
+result :: [Int] -> Int
+-- ^ returns the largest positive sequential integer obtainable from the input
+-- list
+result = targets
+         # (sort . filter (> 0))
+         # zip [1..]
+         # takeWhile (uncurry (==))
+         # length
+
+main :: IO ()
+main = getLine >> getLine >>= words # map read # result # print
