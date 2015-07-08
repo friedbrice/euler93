@@ -39,3 +39,12 @@ opInsert ints     = do
 
 allAExprs :: [Integer] -> [AExpr]
 allAExprs = concatMap opInsert . permutations
+
+allAExprs2 :: [Integer] -> [AExpr]
+allAExprs2 (x:[])   = [IntCon x]
+allAExprs2 ints     = do
+    (ls, rs) <- splits ints
+    let ops = [Add, Sub, Mul, Div]
+        lss = allAExprs2 ls
+        rss = allAExprs2 rs
+    (ABin <$> ops <*> lss <*> rss) ++ (ABin <$> ops <*> rss <*> lss)
