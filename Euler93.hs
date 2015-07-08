@@ -66,21 +66,20 @@ infixl 9 #
 (#) = flip (.)
 
 targets :: [Int] -> [Int]
--- ^ returns the strictly increasing list of all target integers that
---   are obtainable from the given list of integers
+-- ^ returns the list of all target integers that are obtainable from the given
+-- list of integers
 targets = allAExprs
           # map evalAExpr
           # catMaybes
           # filter (\x -> x == (fromInteger . round $ x))
           # map round
-          # sort
           # nub
 
 result :: [Int] -> Int
--- ^ returns the largest positive sequential integer obtainable from the
---   input list
+-- ^ returns the largest positive sequential integer obtainable from the input
+-- list
 result = targets
-         # filter (> 0)
+         # (sort . filter (> 0))
          # zip [1..]
          # takeWhile (uncurry (==))
          # length
