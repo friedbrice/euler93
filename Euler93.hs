@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -funbox-strict-fields #-}
+
 import Control.Monad (join, liftM2)
 import Data.List
 import Data.Maybe (catMaybes)
