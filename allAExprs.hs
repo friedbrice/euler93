@@ -1,5 +1,6 @@
-import Control.Applicative (pure, (<*>), (<$>))
-import Data.List (inits, tails)
+import Control.Applicative
+import Control.Monad
+import Data.List
 
 -- | a data structure for machine-readable arithmetic expressions
 data AExpr = IntCon !Integer
@@ -26,13 +27,12 @@ instance Show (AExpr) where
 
 splits :: [a] -> [([a], [a])]
 -- ^ utility function returns list of all cuts of the given list
-splits xs = zip (inits xs) (tails xs)
+splits xs = init . tail $ zip (inits xs) (tails xs)
 
 opInsert :: [Integer] -> [AExpr]
 -- ^ returns list of all AExprs that use each member of the given list,
 --   in the order given, exactly once
-opInsert []     = []
-opInsert (x:[]) = [IntCon x]
-opInsert ints   = do
+opInsert (x:[])   = [IntCon x]
+opInsert ints     = do
     (ls, rs) <- splits ints
     ABin <$> [Add, Sub, Mul, Div] <*> opInsert ls <*> opInsert rs
