@@ -1,6 +1,6 @@
-import Control.Applicative
-import Data.List
-import Data.Maybe
+import Control.Applicative (liftA2, (<*>))
+import Data.List (inits, nub, permutations, sort, tails)
+import Data.Maybe (catMaybes)
 
 splits :: [a] -> [([a], [a])]
 -- ^ returns all way to cut the given list into two non-empty lists
