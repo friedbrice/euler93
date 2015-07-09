@@ -1,6 +1,6 @@
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad (join, liftM2)
-import Data.List (group, inits, nub, permutations, sort, tails)
+import Data.List (inits, permutations, tails)
 import Data.Maybe (catMaybes)
 
 -- | a data structure for machine-readable arithmetic expressions
@@ -9,6 +9,18 @@ data AExpr = IntCon !Integer
 
 -- | an auxiliary data structure for representing binary ops in AExpr
 data ABinOp = Add | Sub | Mul | Div deriving Eq
+
+-- | replaces an ABinOp token with its common symbol
+instance Show (ABinOp) where
+    show Add = "+"
+    show Sub = "-"
+    show Mul = "*"
+    show Div = "/"
+
+-- | converts an AExpr into human-readable arithmetic
+instance Show (AExpr) where
+    show (IntCon n)    = show n
+    show (ABin op l r) = "(" ++ show l ++ show op ++ show r ++ ")"
 
 evalAExpr :: AExpr -> Maybe Rational
 -- ^ safely evaluates an AExpr to a Maybe Rational
@@ -38,31 +50,3 @@ allAExprs :: [Integer] -> [AExpr]
 -- ^ returns list of all AExprs that use each member of the given list,
 --   in any order, exactly once
 allAExprs = concatMap opInsert . permutations
-
-infixl 9 #
-(#) :: (a -> b) -> (b -> c) -> a -> c
--- ^ convenience infix op for forward function composition
-(#) = flip (.)
-
-targets :: [Integer] -> [Integer]
--- ^ returns the strictly increasing list of all target integers that
---   are obtainable from the given list of integers
-targets = allAExprs
-        # map evalAExpr
-        # catMaybes
-        # filter (\x -> x == (fromInteger . round $ x))
-        # map round
-        # nub
-        # sort
-
-result :: [Integer] -> Int
--- ^ returns the largest positive sequential integer obtainable from the
---   input list
-result = targets
-       # filter (> 0)
-       # zip [1..]
-       # takeWhile (uncurry (==))
-       # length
-
-main :: IO ()
-main = getLine >> getLine >>= words # map read # result # print
