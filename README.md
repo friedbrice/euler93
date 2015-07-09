@@ -5,14 +5,10 @@ Solution to [Project Euler Problem 93][1] in Haskell.
 To run, compile with ghc and execute. It will expect two lines, in
 accodance with the spec set forth by shashank21j in [\[2\]][2]: the
 first line is ignored, and the second line is a space-seperated list of
-positive integers. Output will be (should be) the largest positive
-integer such that it and all smaller positive integers are obtainable
-from our input list and the four arithmetic operations, or zero if no
-positive integer can be generated from our list.
-
-It's broken at the moment, because the algorithm for generating
-well-formed arithmetic expressions is non-exhaustive. I'm presently
-working on a fix.
+positive integers. Output will be the largest positive integer such that
+it and all smaller positive integers are obtainable from our input list
+and the four arithmetic operations, or zero if no positive integer can
+be generated from our list.
 
 Acknowledgements to MichalTerepeta et. al. for the AExpr type in
 [\[3\]][3] and to hammer for the algorithm used to generate all abstract
