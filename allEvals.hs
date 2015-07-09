@@ -1,10 +1,7 @@
 import Control.Applicative (liftA2, (<*>))
 import Data.List (inits, nub, permutations, sort, tails)
 import Data.Maybe (catMaybes)
-
-splits :: [a] -> [([a], [a])]
--- ^ returns all way to cut the given list into two non-empty lists
-splits xs = init . tail $ zip (inits xs) (tails xs)
+import Data.Ratio (numerator, denominator)
 
 opInsert :: [Rational] -> [Maybe Rational]
 -- ^ returns all arithmetic combinations of the numbers from the given
@@ -22,35 +19,18 @@ opInsert ints = do
             safeDiv _        (Just 0) = Nothing
             safeDiv (Just a) (Just b) = Just $ a / b
     [p, m, t, d] <*> opInsert ls <*> opInsert rs
+      where
+        splits xs = init . tail $ zip (inits xs) (tails xs)
 
-allEvals :: [Rational] -> [Maybe Rational]
--- ^ returns all arithmetic combinations of the numbers from the given
---   list in any order.
-allEvals = concatMap opInsert . permutations
+targets :: [Integer] -> [Integer]
+targets = sort . nub
+        . map numerator . filter ((1 ==) . denominator)
+        . catMaybes . concatMap opInsert
+        . permutations . map fromIntegral
 
-infixl 9 #
-(#) :: (a -> b) -> (b -> c) -> a -> c
--- ^ convenience infix op for reverse function composition
-(#) = flip (.)
-
-targets :: [Int] -> [Int]
--- ^ returns the list of all target integers that are obtainable from
---   the given list of integers
-targets = map fromIntegral
-          # allEvals
-          # catMaybes
-          # filter (\x -> x == (fromInteger . round $ x))
-          # map round
-          # nub
-
-result :: [Int] -> Int
--- ^ returns the largest positive sequential integer obtainable from the
---   given list of integers
-result = targets
-         # (sort . filter (> 0))
-         # zip [1..]
-         # takeWhile (uncurry (==))
-         # length
+result :: [Integer] -> Int
+result = length . takeWhile (uncurry (==)) . zip [1..]
+       . filter (>0) . targets
 
 main :: IO ()
-main = getLine >> getLine >>= words # map read # result # print
+main = getLine >> getLine >>= print . result . map read . words
