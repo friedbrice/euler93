@@ -4,8 +4,6 @@ import Data.Maybe (catMaybes)
 import Data.Ratio (numerator, denominator)
 
 opInsert :: [Rational] -> [Maybe Rational]
--- ^ returns all arithmetic combinations of the numbers from the given
---   list in the order given.
 opInsert [x]  = [Just x]
 opInsert ints = do
     (ls, rs) <- splits ints
